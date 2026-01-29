@@ -1,10 +1,8 @@
-// src/pages/inventario.jsx
-export default function inventario() {
+export const Inventario = () => {
   return (
-    <div>
-      <h2 className="text-2xl font-bold text-[#8c0315]">Control de Stock</h2>
-      {/* Aquí irá tu tabla de harina, azúcar, etc. */}
-      <p>Lista de insumos de la pastelería...</p>
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Inventario de Pastelería</h1>
+      <p>Aquí irá la gestión de inventario...</p>
     </div>
-  )
+  );
 }
