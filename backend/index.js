@@ -1,7 +1,9 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import userRoutes from "./routes/userRoutes.js";
+import { router as productosRouter } from "./routes/productos.js";
+import { router as recetasRouter } from "./routes/recetas.js";
+import { connectDB } from "./config/db.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -11,7 +13,8 @@ app.use(cors());
 app.use(express.json()); // Más moderno que body-parser
 
 // Rutas
-app.use("/api/users", userRoutes);
+app.use("/api/productos", productosRouter);
+app.use("/api/recetas", recetasRouter);
 
 app.get("/", (req, res) => {
   res.send("Backend de la Pastelería Online - API Activa");
@@ -23,8 +26,18 @@ app.use((err, req, res, next) => {
   res.status(500).send("Algo salió mal en el servidor");
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
+// Conectar a la base de datos e iniciar el servidor
+(async () => {
+  try {
+    await connectDB();
+    console.log("✅ Conectado a la base de datos");
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error("Error al conectar a la base de datos:", error);
+    process.exit(1);
+  }
+})();
 
 export default app;
