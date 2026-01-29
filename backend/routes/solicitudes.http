@@ -1,0 +1,38 @@
+GET http://localhost:5000/api/productos
+
+
+### obtener el producto por medio de su id,en este caso es por id 1
+GET http://localhost:5000/api/productos/1 
+
+### en esta parte se crea un nuevo producto por medio del metodo post, usando tipo, nombre, descripcion y unidad
+POST http://localhost:5000/api/productos
+Content-Type: application/json
+
+{
+    "tipo": "producto",
+    "nombre": "Lemon pie",
+    "descripcion": "tarta de limon con merengue suizo y decoracion con rodajas de limon y menta fresca",
+    "unidad": "kg"
+}
+
+###
+PUT http://localhost:5000/api/productos/7
+Content-Type: application/json
+
+{
+    "tipo": "producto",
+    "nombre": "Lemon pie actualizado",
+    "descripcion": "tarta de limon con merengue italiano basico sin decoraciones incluidas",
+    "unidad": "kg"
+}
+
+
+//recetas
+###
+GET http://localhost:5000/api/recetas
+
+###
+GET http://localhost:5000/api/recetas/1
+
+
+
