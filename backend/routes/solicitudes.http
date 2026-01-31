@@ -1,38 +1,71 @@
+### Obtener todos los productos
 GET http://localhost:5000/api/productos
 
+### Obtener producto por ID
+GET http://localhost:5000/api/productos/8
 
-### obtener el producto por medio de su id,en este caso es por id 1
-GET http://localhost:5000/api/productos/1 
-
-### en esta parte se crea un nuevo producto por medio del metodo post, usando tipo, nombre, descripcion y unidad
+### Crear un nuevo producto
 POST http://localhost:5000/api/productos
 Content-Type: application/json
 
 {
     "tipo": "producto",
     "nombre": "Lemon pie",
-    "descripcion": "tarta de limon con merengue suizo y decoracion con rodajas de limon y menta fresca",
-    "unidad": "kg"
+    "descripcion": "tarta de limon con merengue suizo",
+    "unidad": "kg",
+    "vendible": 1,
+    "costo_unitario": 10.50,
+    "precio_venta": 15.00
 }
 
-###
-PUT http://localhost:5000/api/productos/7
+### Actualizar producto
+PUT http://localhost:5000/api/productos/8
 Content-Type: application/json
 
 {
     "tipo": "producto",
     "nombre": "Lemon pie actualizado",
-    "descripcion": "tarta de limon con merengue italiano basico sin decoraciones incluidas",
-    "unidad": "kg"
+    "descripcion": "tarta de limon con merengue italiano",
+    "unidad": "kg",
+    "vendible": 1,
+    "costo_unitario": 11.00,
+    "precio_venta": 16.00
 }
 
-
-//recetas
-###
+### SECCIÓN DE RECETAS
+### Obtener todas las recetas
 GET http://localhost:5000/api/recetas
 
-###
-GET http://localhost:5000/api/recetas/1
+### Obtener receta por ID
+GET http://localhost:5000/api/recetas/8
 
+### Crear una nueva receta
+POST http://localhost:5000/api/recetas
+Content-Type: application/json
 
+{
+    "nombre": "Selva Negra",
+    "producto_id": 15
+}
 
+### Agregar ingredientes a una receta
+POST http://localhost:5000/api/recetas/ingredientes 
+Content-Type: application/json
+
+{
+    "receta_id": 1,
+    "producto_id": 3,
+    "cantidad": 0.500
+}
+
+### Actualizar una receta
+PUT http://localhost:5000/api/recetas/1
+Content-Type: application/json
+
+{
+    "nombre": "Selva Negra Actualizada",
+    "producto_id": 15
+}
+
+### Eliminar una receta
+DELETE http://localhost:5000/api/recetas/1
