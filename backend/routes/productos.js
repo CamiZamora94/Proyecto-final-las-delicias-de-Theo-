@@ -20,26 +20,62 @@ const handleValidationErrors = (req, res, next) => {
 // usamos await para esperar a que termine antes de seguir con la siguiente línea.
 //La función query devuelve un arreglo con mucha información. Al poner los corchetes en [rows],
 //  estás extrayendo solo el primer elemento, que contiene el resultado de la operación
+
 router.post(
   "/",
   body("tipo").isString().withMessage("El tipo es obligatorio"),
   body("nombre").isString().withMessage("El nombre es obligatorio"),
   body("descripcion").isString().withMessage("La descripción es obligatoria"),
-  body("unidad").isString().withMessage("La unidad es obligatoria"),
+  body("unidad")
+    .isIn(["u", "g", "kg", "ml", "l"])
+    .withMessage("La unidad debe ser: u, g, kg, ml o l"),
+  body("vendible")
+    .exists()
+    .withMessage("El campo vendible es obligatorio") // Verifica que el campo exista
+    .isIn([0, 1])
+    .withMessage("El campo vendible debe ser 0 (No) o 1 (Si)"), // Solo acepta 0 o 1,
+  body("costo_unitario")
+    .optional()
+    .isNumeric()
+    .withMessage("El costo unitario debe ser un número"),
+  body("precio_venta")
+    .optional()
+    .isNumeric()
+    .withMessage("El precio de venta debe ser un número"),
   handleValidationErrors,
   async (req, res) => {
-    const { tipo, nombre, descripcion, unidad } = req.body;
+    const {
+      id,
+      tipo,
+      nombre,
+      descripcion,
+      unidad,
+      vendible,
+      costo_unitario,
+      precio_venta,
+    } = req.body;
     try {
-      const [rows] = await db.query(
-        "INSERT INTO productos (tipo,nombre, descripcion, unidad) VALUES (?,?,?,?)",
-        [tipo, nombre, descripcion, unidad],
+      const [result] = await db.query(
+        "INSERT INTO productos (tipo, nombre, descripcion, unidad, vendible, costo_unitario, precio_venta) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [
+          tipo,
+          nombre,
+          descripcion,
+          unidad,
+          vendible,
+          costo_unitario,
+          precio_venta,
+        ],
       );
-      res
-        .status(201)
-        .json({ id: rows.insertId, tipo, nombre, descripcion, unidad });
+      res.status(201).json({
+        message: "Producto creado",
+        id: result.insertId,
+      });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ message: "Error al crear el producto" });
+      res
+        .status(500)
+        .json({ message: "Error al crear el producto", error: error.message });
     }
   },
 );
@@ -84,11 +120,28 @@ router.get(
 
 router.put("/:id", async (req, res) => {
   const { id } = req.params;
-  const { tipo, nombre, descripcion, unidad } = req.body;
+  const {
+    tipo,
+    nombre,
+    descripcion,
+    unidad,
+    vendible,
+    costo_unitario,
+    precio_venta,
+  } = req.body;
   try {
     const [result] = await db.query(
-      "UPDATE productos SET tipo = ?, nombre = ?, descripcion = ?, unidad = ? WHERE id = ?",
-      [tipo, nombre, descripcion, unidad, id],
+      "UPDATE productos SET tipo = COALESCE(?, tipo), nombre = COALESCE(?, nombre), descripcion = COALESCE(?, descripcion), unidad = COALESCE(?, unidad), vendible = COALESCE(?, vendible), costo_unitario = COALESCE(?, costo_unitario), precio_venta = COALESCE(?, precio_venta) WHERE id = ?",
+      [
+        tipo,
+        nombre,
+        descripcion,
+        unidad,
+        vendible,
+        costo_unitario,
+        precio_venta,
+        id,
+      ],
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ message: "Producto no encontrado" });
@@ -96,7 +149,10 @@ router.put("/:id", async (req, res) => {
     res.json({ message: "Producto actualizado exitosamente" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Error al actualizar el producto" });
+    res.status(500).json({
+      message: "Error al actualizar el producto",
+      error: error.message,
+    });
   }
 });
 
