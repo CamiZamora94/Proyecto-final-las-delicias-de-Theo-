@@ -16,11 +16,6 @@ const handleValidationErrors = (req, res, next) => {
 };
 
 //crear el producto
-//Como la base de datos tarda un poco en responder,
-// usamos await para esperar a que termine antes de seguir con la siguiente línea.
-//La función query devuelve un arreglo con mucha información. Al poner los corchetes en [rows],
-//  estás extrayendo solo el primer elemento, que contiene el resultado de la operación
-
 router.post(
   "/",
   body("tipo").isString().withMessage("El tipo es obligatorio"),
@@ -32,20 +27,25 @@ router.post(
   body("vendible")
     .exists()
     .withMessage("El campo vendible es obligatorio") // Verifica que el campo exista
-    .isIn([0, 1])
-    .withMessage("El campo vendible debe ser 0 (No) o 1 (Si)"), // Solo acepta 0 o 1,
+    .isBoolean()
+    .withMessage("El campo vendible debe ser verdadero o falso"),
   body("costo_unitario")
     .optional()
     .isNumeric()
-    .withMessage("El costo unitario debe ser un número"),
+    .withMessage("El costo unitario debe ser un número")
+    .isFloat({ gt: 0 })
+    .withMessage("El costo unitario debe ser un número positivo")
+    .toFloat(),
   body("precio_venta")
     .optional()
     .isNumeric()
-    .withMessage("El precio de venta debe ser un número"),
+    .withMessage("El precio de venta debe ser un número")
+    .isFloat({ gt: 0 })
+    .withMessage("El precio de venta debe ser un número positivo")
+    .toFloat(),
   handleValidationErrors,
   async (req, res) => {
     const {
-      id,
       tipo,
       nombre,
       descripcion,
@@ -56,26 +56,93 @@ router.post(
     } = req.body;
     try {
       const [result] = await db.query(
-        "INSERT INTO productos (tipo, nombre, descripcion, unidad, vendible, costo_unitario, precio_venta) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO productos (tipo,nombre,descripcion,unidad,vendible,costo_unitario,precio_venta) VALUES (?,?,?,?,?,?,?)",
         [
           tipo,
           nombre,
           descripcion,
           unidad,
-          vendible,
-          costo_unitario,
-          precio_venta,
+          vendible ? 1 : 0,
+          costo_unitario || 0,
+          precio_venta || 0,
         ],
       );
       res.status(201).json({
-        message: "Producto creado",
-        id: result.insertId,
+        message: "Producto creado exitosamente",
+        productId: result.insertId,
       });
     } catch (error) {
       console.error(error);
-      res
-        .status(500)
-        .json({ message: "Error al crear el producto", error: error.message });
+      res.status(500).json({
+        message:
+          "Error al crear el producto, por favor revisa los datos ingresados",
+        error: error.message,
+      });
+    }
+  },
+);
+
+//Como la base de datos tarda un poco en responder,
+// usamos await para esperar a que termine antes de seguir con la siguiente línea.
+//La función query devuelve un arreglo con mucha información. Al poner los corchetes en [rows],
+// estás extrayendo solo el primer elemento, que contiene el resultado de la operación
+//en este post lo que vamos a hacer que es se puedan ingresar varios productos a la vez
+//El asterisco * le dice al validador que debe entrar en el array y chequea cada uno de los elementos que están adentro
+//El método isArray() verifica que el cuerpo de la solicitud sea un arreglo
+//const valores es un array de arrays, donde cada lista interna representa un producto con sus respectivos campos
+
+router.post(
+  "/bulk",
+  body()
+    .isArray({ min: 1 })
+    .withMessage("La lista de productos no puede estar vacía"),
+  body("*.tipo").isString().withMessage("El tipo es obligatorio"),
+  body("*.nombre").isString().withMessage("El nombre es obligatorio"),
+  body("*.descripcion").isString().withMessage("La descripción es obligatoria"),
+  body("*.unidad")
+    .isIn(["u", "g", "kg", "ml", "l"])
+    .withMessage("La unidad debe ser: u, g, kg, ml o l"),
+  body("*.vendible")
+    .exists()
+    .withMessage("El campo vendible es obligatorio") // Verifica que el campo exista
+    .isBoolean()
+    .withMessage("El campo vendible debe ser verdadero o falso"),
+  body("*.costo_unitario")
+    .optional()
+    .isNumeric()
+    .withMessage("El costo unitario debe ser un número"),
+  body("*.precio_venta")
+    .optional()
+    .isNumeric()
+    .withMessage("El precio de venta debe ser un número"),
+  handleValidationErrors,
+  async (req, res) => {
+    const productos = req.body;
+    const valores = productos.map((p) => [
+      p.tipo,
+      p.nombre,
+      p.descripcion,
+      p.unidad,
+      p.vendible ? 1 : 0,
+      p.costo_unitario || 0,
+      p.precio_venta || 0,
+    ]);
+    try {
+      const [result] = await db.query(
+        "INSERT INTO productos (tipo,nombre,descripcion,unidad,vendible,costo_unitario,precio_venta) VALUES ?",
+        [valores],
+      );
+      res.status(201).json({
+        message: "Los productos fueron creados exitosamente",
+        count: result.affectedRows,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        message:
+          "Error al crear los productos, por favor revisa los datos ingresados",
+        error: error.message,
+      });
     }
   },
 );
