@@ -8,6 +8,15 @@ import { connectDB } from "./config/db.js";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+await connectDB().then(() => {
+  console.log("✅ Conectado a la base de datos");
+}).catch((error) => {
+  console.error("Error al conectar a la base de datos:", error);
+  process.exit(1);
+});
+
+
+
 // Middlewares
 app.use(cors());
 app.use(express.json()); // Más moderno que body-parser
@@ -26,18 +35,9 @@ app.use((err, req, res, next) => {
   res.status(500).send("Algo salió mal en el servidor");
 });
 
-// Conectar a la base de datos e iniciar el servidor
-(async () => {
-  try {
-    await connectDB();
-    console.log("✅ Conectado a la base de datos");
-    app.listen(PORT, () => {
-      console.log(`Server running on http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error("Error al conectar a la base de datos:", error);
-    process.exit(1);
-  }
-})();
 
-export default app;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+}); 
+
+
