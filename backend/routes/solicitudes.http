@@ -4,7 +4,7 @@ GET http://localhost:5000/api/productos
 ### Obtener producto por ID
 GET http://localhost:5000/api/productos/8
 
-### Crear un nuevo producto
+### Crear producto
 POST http://localhost:5000/api/productos
 Content-Type: application/json
 
@@ -17,6 +17,31 @@ Content-Type: application/json
     "costo_unitario": 10.50,
     "precio_venta": 15.00
 }
+
+### crear varios productos
+POST http://localhost:5000/api/productos/bulk
+Content-Type: application/json
+
+[
+    {
+        "tipo": "insumo",
+        "nombre": "Harina 0000",
+        "descripcion": "harina de trigo de alta calidad",
+        "unidad": "kg",
+        "vendible": 0,
+        "costo_unitario": 2.00,
+        "precio_venta": 0.00
+    },
+    {
+        "tipo": "insumo",
+        "nombre": "Azúcar",
+        "descripcion": "azúcar blanca refinada",
+        "unidad": "kg",
+        "vendible": 0,
+        "costo_unitario": 1.50,
+        "precio_venta": 0.00
+    }
+]
 
 ### Actualizar producto
 PUT http://localhost:5000/api/productos/8
