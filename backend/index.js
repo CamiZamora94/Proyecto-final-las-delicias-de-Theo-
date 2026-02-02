@@ -15,8 +15,6 @@ await connectDB().then(() => {
   process.exit(1);
 });
 
-
-
 // Middlewares
 app.use(cors());
 app.use(express.json()); // Más moderno que body-parser
@@ -35,7 +33,7 @@ app.use((err, req, res, next) => {
   res.status(500).send("Algo salió mal en el servidor");
 });
 
-
+// Iniciar el servidor
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 }); 
