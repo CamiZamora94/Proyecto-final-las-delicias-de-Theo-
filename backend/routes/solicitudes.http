@@ -44,7 +44,7 @@ Content-Type: application/json
 ]
 
 ### Actualizar producto
-PUT http://localhost:5000/api/productos/8
+PUT http://localhost:5000/api/productos/19
 Content-Type: application/json
 
 {
@@ -62,15 +62,15 @@ Content-Type: application/json
 GET http://localhost:5000/api/recetas
 
 ### Obtener receta por ID
-GET http://localhost:5000/api/recetas/8
+GET http://localhost:5000/api/recetas/5
 
 ### Crear una nueva receta
 POST http://localhost:5000/api/recetas
 Content-Type: application/json
 
 {
-    "nombre": "Selva Negra",
-    "producto_id": 15
+    "nombre": "lemon pie",
+    "producto_id": 19
 }
 
 ### Agregar ingredientes a una receta
@@ -78,18 +78,18 @@ POST http://localhost:5000/api/recetas/ingredientes
 Content-Type: application/json
 
 {
-    "receta_id": 1,
-    "producto_id": 3,
+    "receta_id": 6,
+    "producto_id": 19,
     "cantidad": 0.500
 }
 
 ### Actualizar una receta
-PUT http://localhost:5000/api/recetas/1
+PUT http://localhost:5000/api/recetas/6
 Content-Type: application/json
 
 {
-    "nombre": "Selva Negra Actualizada",
-    "producto_id": 15
+    "nombre": "lemon pie actualizado",
+    "producto_id": 19
 }
 
 ### Eliminar una receta
