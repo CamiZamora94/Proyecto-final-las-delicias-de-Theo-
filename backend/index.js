@@ -20,6 +20,7 @@ await connectDB().then(() => {
 app.use(cors());
 app.use(express.json()); // Más moderno que body-parser
 
+
 // Rutas
 app.use("/api/productos", productosRouter);
 app.use("/api/recetas", recetasRouter);
