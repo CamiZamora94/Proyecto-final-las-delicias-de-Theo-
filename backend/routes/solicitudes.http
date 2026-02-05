@@ -115,14 +115,17 @@ Content-Type: application/json
 }
 
 ### actualizar una venta
-PUT http://localhost:5000/api/ventas/4
+PUT http://localhost:5000/api/ventas/6
 Content-Type: application/json
 
 {
     "fecha": "2024-06-16",
     "cliente_nombre": "Juan Pérez",
-    "total": 50.00,
+    "total": 80.00,
     "estado": "completado",
     "metodo_pago": "efectivo"
 }
+
+### eliminar una venta 
+DELETE http://localhost:5000/api/ventas/6
 
