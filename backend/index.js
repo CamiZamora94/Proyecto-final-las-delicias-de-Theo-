@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import { router as productosRouter } from "./routes/productos.js";
 import { router as recetasRouter } from "./routes/recetas.js";
+import { router as ventasRouter } from "./routes/ventas.js";
 import { connectDB } from "./config/db.js";
 
 const app = express();
@@ -22,6 +23,8 @@ app.use(express.json()); // Más moderno que body-parser
 // Rutas
 app.use("/api/productos", productosRouter);
 app.use("/api/recetas", recetasRouter);
+app.use("/api/ventas", ventasRouter);
+
 
 app.get("/", (req, res) => {
   res.send("Backend de la Pastelería Online - API Activa");
