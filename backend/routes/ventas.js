@@ -117,19 +117,41 @@ router.put(
     .withMessage("El método de pago debe ser una cadena de texto"),
   handleValidationErrors,
   async (req, res) => {
-    const { id, fecha, cliente_nombre, total, estado, metodo_pago } = req.body;
+    const { fecha, cliente_nombre, total, estado, metodo_pago } = req.body;
+    const {id: idParam} = req.params;
     try {
       const [result] = await db.query(
         "UPDATE ventas SET fecha = ?, cliente_nombre = ?, total = ?, estado = ?, metodo_pago = ? WHERE id = ?",
-        [fecha, cliente_nombre, total, estado, metodo_pago, id],
+        [fecha, cliente_nombre, total, estado, metodo_pago, idParam],
       );
       if (result.affectedRows === 0) {
         return res.status(404).json({ message: "Venta no encontrada" });
       }
-      res.json({ id, fecha, cliente_nombre, total, estado, metodo_pago });
+      res.json({ id: idParam, fecha, cliente_nombre, total, estado, metodo_pago });
     } catch (error) {
       console.error("Error al actualizar la venta:", error);
       res.status(500).json({ message: "Error al actualizar la venta" });
     }
   },
 );
+
+//eliminar una venta
+router.delete("/:id",
+  param("id").isInt().withMessage("El id de la venta deber ser un numero entero"),
+  handleValidationErrors,
+  async (req, res) => {
+    const {id} = req.params;
+    try {
+      const[result] = await db.query("DELETE FROM ventas WHERE id = ?" ,[id]);
+      if (result.affectedRows === 0) {
+        return res.status(400).json({ message :"La venta que no ha sido encontrada"});
+      }
+      res.json({ message: "La venta ha sido eliminada correctamente", id});
+    } catch (error) {
+      console.error("Error al eliminar la venta", error);
+      res.status(500).json({ message: "Error al eliminar la venta"});
+    }
+  }
+);
+
+export default router;
