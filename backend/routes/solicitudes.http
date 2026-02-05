@@ -94,3 +94,8 @@ Content-Type: application/json
 
 ### Eliminar una receta
 DELETE http://localhost:5000/api/recetas/1
+
+
+### Obtener todas las ventas
+GET http://localhost:5000/api/ventas
+
