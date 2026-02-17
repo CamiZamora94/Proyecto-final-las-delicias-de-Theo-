@@ -1,6 +1,8 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 import { router as productosRouter } from "./routes/productos.js";
 import { router as recetasRouter } from "./routes/recetas.js";
 import { router as ventasRouter } from "./routes/ventas.js";
