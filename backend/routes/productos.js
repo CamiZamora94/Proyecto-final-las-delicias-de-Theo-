@@ -2,6 +2,8 @@ import { db } from "../config/db.js";
 import validatorPkg from "express-validator";
 const { body, param, validationResult } = validatorPkg;
 import express from "express";
+import checkAuth from '../middleware/checkAuth.js';
+
 
 export const router = express.Router(); //es un contenedor de rutas
 
@@ -156,6 +158,11 @@ router.get("/", async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Error al obtener los productos" });
   }
+});
+
+// Esta ruta ahora está protegida. Solo usuarios logueados pueden ver el stock.
+router.get('/stock', checkAuth, (req, res) => {
+    res.json({ msg: `Bienvenido ${req.usuario.nombre}, aquí tienes el stock de ingredientes.` });
 });
 
 //obtenemos un producto por id
