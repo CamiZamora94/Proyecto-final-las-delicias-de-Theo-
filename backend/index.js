@@ -1,4 +1,3 @@
-import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -23,12 +22,12 @@ await connectDB().then(() => {
 app.use(cors());
 app.use(express.json()); // Más moderno que body-parser
 
-
 // Rutas
 app.use("/api/productos", productosRouter);
 app.use("/api/recetas", recetasRouter);
 app.use("/api/ventas", ventasRouter);
-app.use("/api/auth", authRouter); // Agregar la ruta de autenticación
+app.use("/api/auth/", authRouter); // Agregar la ruta de autenticación
+app.use("/api/auth/register", authRouter); // Agregar la ruta de registro
 
 
 app.get("/", (req, res) => {
