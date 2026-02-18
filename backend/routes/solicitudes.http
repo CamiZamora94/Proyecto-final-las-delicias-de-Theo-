@@ -131,11 +131,21 @@ DELETE http://localhost:5000/api/ventas/6
 
 
 ### creamos el usuario
-POST http://localhost:5000/api/auth
+POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-    "nombre":"Camila",
-    "email": "camizamora_94@hotmail.com",
-    "password":"Teo461953"
+    "nombre":"Camilaa",
+    "email": "camizamoraa_94@hotmail.com",
+    "password":"Teo4619533"
+}
+
+
+###
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+    "email": "camizamoraa_94@hotmail.com",
+    "password": "Teo4619533"
 }
