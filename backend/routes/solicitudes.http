@@ -149,3 +149,17 @@ Content-Type: application/json
     "email": "camizamoraa_94@hotmail.com",
     "password": "Teo4619533"
 }
+
+###
+GET http://localhost:5000/api/auth/perfil
+Authorization: Bearer $2b$10$d5nb.1VQUSKu7jlN1rY5Su3MKuldMwQtiA0Di9eQgyANxNaECG.Ky
+
+
+###
+POST http://localhost:5000/api/auth/logout
+Content-Type: application/json
+
+
+### Prueba de ruta protegida
+GET http://localhost:5000/api/auth/protected
+Authorization: Bearer $2b$10$d5nb.1VQUSKu7jlN1rY5Su3MKuldMwQtiA0Di9eQgyANxNaECG.Ky
