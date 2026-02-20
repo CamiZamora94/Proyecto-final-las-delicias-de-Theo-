@@ -4,7 +4,7 @@ import validatorPkg from "express-validator";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken"; // Importante para el login
 import { loginUser } from "../controllers/authController.js";
-
+import checkAuth from '../middleware/checkAuth.js';
 
 const { body, validationResult } = validatorPkg;
 export const router = express.Router();
@@ -16,6 +16,16 @@ const handleValidationErrors = (req, res, next) => {
   }
   next();
 };
+
+router.get('/perfil', checkAuth, (req, res) => {
+    // req.usuario viene del middleware que creamos arriba
+    res.json({
+        msg: "Perfil del usuario",
+        usuario: req.usuario
+    });
+});
+
+
 
 // --- RUTA DE REGISTRO ---
 router.post(
@@ -33,7 +43,7 @@ router.post(
 
       const [result] = await db.query(
         "INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)",
-        [nombre, email, hashedPassword]
+        [nombre, email, hashedPassword],
       );
 
       res.status(201).json({
@@ -43,12 +53,14 @@ router.post(
         email,
       });
     } catch (error) {
-      if (error.code === 'ER_DUP_ENTRY') {
-        return res.status(400).json({ message: "El correo ya está registrado" });
+      if (error.code === "ER_DUP_ENTRY") {
+        return res
+          .status(400)
+          .json({ message: "El correo ya está registrado" });
       }
       res.status(500).json({ message: "Error interno en el servidor" });
     }
-  }
+  },
 );
 
 // --- RUTA DE LOGIN ---
@@ -57,7 +69,7 @@ router.post(
   body("email").isEmail().withMessage("Introduce un email válido"),
   body("password").notEmpty().withMessage("El password es obligatorio"),
   handleValidationErrors, // Primero validamos los campos
-  loginUser               // Luego ejecutamos la lógica del controlador
+  loginUser, // Luego ejecutamos la lógica del controlador
 );
 // router.post(
 //   "/login",
@@ -98,5 +110,30 @@ router.post(
 //     }
 //   }
 // );
+
+router.post("/logout", (req, res) => {
+  // En JWT, el logout se maneja en el frontend eliminando el token.
+  // Aquí podríamos implementar una lista negra de tokens si queremos invalidarlos.
+  res.json({
+    message: "Logout  ha sido exitoso (elimina el token en el frontend)",
+  });
+});
+
+router.get("/protected", (req, res) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+    return res.status(401).json({ message: "No token provided" });
+  }
+  const token = authHeader.split(" ")[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    res.json({
+      message: "Acceso concedido a ruta protegida",
+      userId: decoded.id,
+    });
+  } catch (error) {
+    res.status(401).json({ message: "Token inválido" });
+  }
+});
 
 export default router;
