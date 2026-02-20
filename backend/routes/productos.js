@@ -8,6 +8,7 @@ import checkAuth from '../middleware/checkAuth.js';
 export const router = express.Router(); //es un contenedor de rutas
 
 // Middleware para manejar errores de validación
+//Un middleware es un metodo que se ejecuta antes de que se llegue a las peticiones(importe recordar)
 // Revisa los resultados de las validaciones y responde con 400 si hay errores
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
