@@ -30,8 +30,8 @@ router.post(
   body("vendible")
     .exists()
     .withMessage("El campo vendible es obligatorio") // Verifica que el campo exista
-    .isBoolean()
-    .withMessage("El campo vendible debe ser verdadero o falso"),
+    .isIn([0, 1])
+    .withMessage("El campo vendible debe ser 1 o 0"),
   body("costo_unitario")
     .optional()
     .isNumeric()
