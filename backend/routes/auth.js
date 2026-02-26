@@ -2,9 +2,9 @@ import express from "express";
 import { db } from "../config/db.js";
 import validatorPkg from "express-validator";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken"; // Importante para el login
+// import jwt from "jsonwebtoken";
 import { loginUser } from "../controllers/authController.js";
-import checkAuth from '../middleware/checkAuth.js';
+import checkAuth from "../middleware/checkAuth.js";
 
 const { body, validationResult } = validatorPkg;
 export const router = express.Router();
@@ -17,19 +17,17 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-router.get('/perfil', checkAuth, (req, res) => {
-    // req.usuario viene del middleware que creamos arriba
-    res.json({
-        msg: "Perfil del usuario",
-        usuario: req.usuario
-    });
+router.get("/perfil/usuario", checkAuth, (req, res) => {
+  // req.usuario viene del middleware que creamos arriba
+  res.json({
+    msg: "Perfil del usuario",
+    usuario: req.usuario,
+  });
 });
-
-
 
 // --- RUTA DE REGISTRO ---
 router.post(
-  "/", // Cambia "/" por "/register" para evitar confusiones
+  "/register", // Cambia "/" por "/register" para evitar confusiones
   body("nombre").notEmpty().withMessage("El nombre es obligatorio"),
   body("email").isEmail().withMessage("Email inválido"),
   body("password").isLength({ min: 6 }).withMessage("Mínimo 6 caracteres"),
@@ -71,45 +69,6 @@ router.post(
   handleValidationErrors, // Primero validamos los campos
   loginUser, // Luego ejecutamos la lógica del controlador
 );
-// router.post(
-//   "/login",
-//   body("email").isEmail().withMessage("Introduce un email válido"),
-//   body("password").notEmpty().withMessage("El password es obligatorio"),
-//   handleValidationErrors,
-//   async (req, res) => {
-//     const { email, password } = req.body;
-//     try {
-//       // 1. Buscar usuario
-//       const [rows] = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
-//       if (rows.length === 0) {
-//         return res.status(404).json({ message: "El usuario no existe" });
-//       }
-
-//       const usuario = rows[0];
-
-//       // 2. Comparar password hasheado
-//       const isMatch = await bcrypt.compare(password, usuario.password);
-//       if (!isMatch) {
-//         return res.status(401).json({ message: "Contraseña incorrecta" });
-//       }
-
-//       // 3. Generar Token para la sesión
-//       const token = jwt.sign(
-//         { id: usuario.id },
-//         process.env.JWT_SECRET,
-//         { expiresIn: '8h' }
-//       );
-
-//       res.json({
-//         message: "Login exitoso",
-//         token,
-//         usuario: { id: usuario.id, nombre: usuario.nombre, email: usuario.email }
-//       });
-//     } catch (error) {
-//       res.status(500).json({ message: "Error al iniciar sesión" });
-//     }
-//   }
-// );
 
 router.post("/logout", (req, res) => {
   // En JWT, el logout se maneja en el frontend eliminando el token.
@@ -119,17 +78,11 @@ router.post("/logout", (req, res) => {
   });
 });
 
-router.get("/protected", (req, res) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-  const token = authHeader.split(" ")[1];
+router.get("/protected", checkAuth, (req, res) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     res.json({
       message: "Acceso concedido a ruta protegida",
-      userId: decoded.id,
+      user: req.usuario?.nombre || "Usuario desconocido",
     });
   } catch (error) {
     res.status(401).json({ message: "Token inválido" });
