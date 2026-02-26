@@ -151,8 +151,7 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:5000/api/auth/perfil
-Authorization: Bearer $2b$10$d5nb.1VQUSKu7jlN1rY5Su3MKuldMwQtiA0Di9eQgyANxNaECG.Ky
+GET http://localhost:5000/api/auth/perfil/usuario
 
 
 ###
@@ -162,4 +161,4 @@ Content-Type: application/json
 
 ### Prueba de ruta protegida
 GET http://localhost:5000/api/auth/protected
-Authorization: Bearer $2b$10$d5nb.1VQUSKu7jlN1rY5Su3MKuldMwQtiA0Di9eQgyANxNaECG.Ky
+
