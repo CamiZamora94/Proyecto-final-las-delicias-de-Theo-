@@ -35,12 +35,7 @@ export const loginUser = async (req, res) => {
     // 4. Respuesta exitosa para React
     res.json({
       message: "Inicio de sesión exitoso",
-      usuario: {
-        id: usuario.id,
-        nombre: usuario.nombre,
-        email: usuario.email,
-        rol: usuario.rol, // Admin o Vendedor
-      },
+      token,
     });
   } catch (error) {
     console.error("Error en login:", error);
