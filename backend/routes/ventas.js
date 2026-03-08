@@ -14,11 +14,36 @@ const handleValidationErrors = (req, res, next) => {
   next();
 };
 
-//obtener las ventas
+//obtener las ventas con sus productos
 router.get("/", async (req, res) => {
   try {
-    const [rows] = await db.query("SELECT * FROM ventas");
-    res.json(rows);
+    const query = `
+      SELECT v.*, dv.producto_id, dv.cantidad, dv.precio_unitario as precio, p.nombre as producto_nombre
+      FROM ventas v
+      LEFT JOIN detalle_ventas dv ON v.id = dv.venta_id
+      LEFT JOIN productos p ON dv.producto_id = p.id
+      ORDER BY v.fecha DESC, v.id DESC
+    `;
+    const [rows] = await db.query(query);
+    
+    // Agrupamos los productos por cada venta
+    const ventasMap = rows.reduce((acc, row) => {
+      const { id, producto_id, cantidad, precio, producto_nombre, ...ventaInfo } = row;
+      if (!acc[id]) {
+        acc[id] = { ...ventaInfo, id, productos: [] };
+      }
+      if (producto_id) {
+        acc[id].productos.push({
+          producto_id,
+          nombre: producto_nombre,
+          cantidad,
+          precio
+        });
+      }
+      return acc;
+    }, {});
+
+    res.json(Object.values(ventasMap));
   } catch (error) {
     console.error("Error al obtener las ventas:", error);
     res.status(500).json({ message: "Error al obtener las ventas" });
@@ -67,23 +92,46 @@ router.post(
     .withMessage("El método de pago debe ser una cadena de texto"),
   handleValidationErrors,
   async (req, res) => {
-    const { fecha, cliente_nombre, total, estado, metodo_pago } = req.body;
+    const { fecha, cliente_nombre, total, estado, metodo_pago, productos } = req.body;
     try {
+      await db.beginTransaction();
+      
       const [result] = await db.query(
         "INSERT INTO ventas (fecha, cliente_nombre, total, estado, metodo_pago) VALUES (?, ?, ?, ?, ?)",
-        [fecha, cliente_nombre, total, estado, metodo_pago],
+        [fecha, cliente_nombre, total, estado, metodo_pago || 'Efectivo'],
       );
+      
+      const ventaId = result.insertId;
+
+      if (productos && productos.length > 0) {
+        const valoresDetalle = productos.map(p => [
+          ventaId, 
+          p.producto_id, 
+          p.cantidad, 
+          p.precio
+        ]);
+        
+        await db.query(
+          "INSERT INTO detalle_ventas (venta_id, producto_id, cantidad, precio_unitario) VALUES ?",
+          [valoresDetalle]
+        );
+      }
+
+      await db.commit();
+      
       res.status(201).json({
-        id: result.insertId,
+        id: ventaId,
         fecha,
         cliente_nombre,
         total,
         estado,
         metodo_pago,
+        productos
       });
     } catch (error) {
+      await db.rollback();
       console.error("Error al crear la venta:", error);
-      res.status(500).json({ message: "Error al crear la venta" });
+      res.status(500).json({ message: "Error al crear la venta", error: error.message });
     }
   },
 );
