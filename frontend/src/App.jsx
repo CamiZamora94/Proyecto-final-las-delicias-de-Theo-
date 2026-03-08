@@ -1,29 +1,30 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { LayoutPrincipal } from './layout/LayoutPrincipal.jsx';
 import { Resumen } from './pages/Resumen.jsx';
-// Importa correctamente los componentes de Tarjeta
-// Asegúrate de que exista el componente Inventario (nota: los componentes deben empezar con mayúscula)
-import { Inventario } from "./pages/Inventario.jsx";
-import Sidebar from "./components/Sidebar.jsx";
+import { Inventario } from "./pages/inventario.jsx"; 
 import { Ventas } from './pages/Ventas.jsx';
+import { Login } from './pages/login.jsx'; 
+import Sidebar from "./components/Sidebar.jsx";
 
-
-function App() {
+function AppWithSidebar() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/ingreso" element={<h1>pagina de ingreso</h1>} />
-        
-        {/* Ruta principal con Layout */}
-        <Route path="/" element={<LayoutPrincipal />}>
-          <Route index element={<Resumen />} />
-          <Route path="ventas" element={<Ventas />} />
-          <Route path="inventario" element={<Inventario />} />
-          <Route path="recetario" element={<h1>pagina de recetario</h1>} />
-        </Route>
-      </Routes>
+      <div style={{ display: 'flex', height: '100vh' }}>
+        <Sidebar />
+        <div style={{ flex: 1, padding: '20px' }}>
+          <Routes>
+            <Route path="/ingreso" element={<Login />} />
+            <Route path="/" element={<LayoutPrincipal />}>
+              <Route index element={<Resumen />} />
+              <Route path="ventas" element={<Ventas />} />
+              <Route path="inventario" element={<Inventario />} />
+              <Route path="recetario" element={<h1>Página de Recetario</h1>} />
+            </Route>
+          </Routes>
+        </div>
+      </div>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default AppWithSidebar;
