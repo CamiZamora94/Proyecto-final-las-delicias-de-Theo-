@@ -5,7 +5,7 @@ export const ResumenVentas = ({ totalVentas, ventasCompletadas, promedioVenta, t
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Ventas Totales</p>
-            <p className="text-2xl font-bold text-[#8c0315] mt-1">${totalVentas.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-[#8c0315] mt-1">AR$ ${(Number(totalVentas) || 0).toFixed(2)}</p>
           </div>
           <div className="text-2xl">💰</div>
         </div>
@@ -20,14 +20,16 @@ export const ResumenVentas = ({ totalVentas, ventasCompletadas, promedioVenta, t
           </div>
           <div className="text-2xl">✅</div>
         </div>
-        <p className="text-xs text-green-600 mt-2">{Math.round((ventasCompletadas/totalTransacciones)*100)}% del total</p>
+        <p className="text-xs text-green-600 mt-2">
+          {totalTransacciones > 0 ? Math.round((ventasCompletadas/totalTransacciones)*100) : 0}% del total
+        </p>
       </div>
       
       <div className="bg-white p-6 rounded-xl shadow-sm border border-[#d3b9b9]/30">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Promedio por Venta</p>
-            <p className="text-2xl font-bold text-gray-800 mt-1">${promedioVenta.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-gray-800 mt-1">AR$ ${(Number(promedioVenta) || 0).toFixed(2)}</p>
           </div>
           <div className="text-2xl">📊</div>
         </div>

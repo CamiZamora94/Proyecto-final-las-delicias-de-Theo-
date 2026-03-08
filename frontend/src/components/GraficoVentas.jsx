@@ -16,9 +16,8 @@ export const GraficoVentas = ({ datos, titulo, subtitulo }) => {
         <BarChart data={datos}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis dataKey="dia" />
-          <YAxis tickFormatter={(value) => `$${value}`} />
-          <Tooltip formatter={(value) => [`$${value}`, "Ventas"]} />
-          <Legend />
+          <YAxis tickFormatter={(value) => `AR$ ${value}`} />
+          <Tooltip formatter={(value) => [`AR$ ${value}`, "Ventas"]} />
           <Bar dataKey="ventas" fill="#8c0315" radius={[8, 8, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
