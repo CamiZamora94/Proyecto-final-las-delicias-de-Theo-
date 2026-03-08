@@ -1,19 +1,12 @@
 import { useState } from 'react';
 
-export const TablaVentas = ({ ventas, filtros }) => {
+export const TablaVentas = ({ ventas, totalOriginal, onEliminar }) => {
   const [ventaSeleccionada, setVentaSeleccionada] = useState(null);
-
-  // Filtrar ventas según los filtros
-  const ventasFiltradas = ventas.filter(venta => {
-    if (filtros.estado !== 'todos' && venta.estado !== filtros.estado) return false;
-    if (filtros.cliente && !venta.cliente.toLowerCase().includes(filtros.cliente.toLowerCase())) return false;
-    // Aquí podrías agregar más lógica de filtrado por fecha si lo necesitas
-    return true;
-  });
 
   // Función para obtener el color según el estado
   const getColorEstado = (estado) => {
-    switch (estado) {
+    const status = estado?.toUpperCase();
+    switch (status) {
       case 'COMPLETADO':
         return 'bg-green-100 text-green-800 border-green-200';
       case 'PENDIENTE':
@@ -43,7 +36,7 @@ export const TablaVentas = ({ ventas, filtros }) => {
               </tr>
             </thead>
             <tbody>
-              {ventasFiltradas.map((venta) => (
+              {ventas.map((venta) => (
                 <tr 
                   key={venta.id} 
                   className="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
@@ -54,13 +47,13 @@ export const TablaVentas = ({ ventas, filtros }) => {
                   </td>
                   <td className="p-4">
                     <div>
-                      <p className="font-medium text-gray-800">{venta.cliente}</p>
-                      <p className="text-sm text-gray-500">{venta.productos.length} productos</p>
+                      <p className="font-medium text-gray-800">{venta.cliente_nombre || venta.cliente}</p>
+                      <p className="text-sm text-gray-500">{(venta.productos?.length || 0)} productos</p>
                     </div>
                   </td>
                   <td className="p-4 text-gray-700">{venta.fecha}</td>
                   <td className="p-4">
-                    <span className="font-bold text-[#8c0315]">${venta.total.toFixed(2)}</span>
+                    <span className="font-bold text-[#8c0315]">AR$ ${(Number(venta.total) || 0).toFixed(2)}</span>
                   </td>
                   <td className="p-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getColorEstado(venta.estado)}`}>
@@ -91,7 +84,7 @@ export const TablaVentas = ({ ventas, filtros }) => {
                         className="text-gray-600 hover:text-red-600 p-1"
                         onClick={(e) => {
                           e.stopPropagation();
-                          // Acción de eliminar
+                          onEliminar(venta.id);
                         }}
                       >
                         🗑️
@@ -121,7 +114,7 @@ export const TablaVentas = ({ ventas, filtros }) => {
               <div>
                 <h4 className="font-semibold text-gray-700 mb-2">Información del Cliente</h4>
                 <div className="space-y-2">
-                  <p><span className="text-gray-600">Nombre:</span> {ventaSeleccionada.cliente}</p>
+                  <p><span className="text-gray-600">Nombre:</span> {ventaSeleccionada.cliente_nombre || ventaSeleccionada.cliente}</p>
                   <p><span className="text-gray-600">Fecha:</span> {ventaSeleccionada.fecha}</p>
                   <p><span className="text-gray-600">Estado:</span> 
                     <span className={`ml-2 px-2 py-1 rounded text-xs ${getColorEstado(ventaSeleccionada.estado)}`}>
@@ -134,19 +127,19 @@ export const TablaVentas = ({ ventas, filtros }) => {
               <div>
                 <h4 className="font-semibold text-gray-700 mb-2">Productos</h4>
                 <div className="space-y-2">
-                  {ventaSeleccionada.productos.map((producto, index) => (
+                  {ventaSeleccionada.productos?.map((producto, index) => (
                     <div key={index} className="flex justify-between items-center bg-white p-3 rounded-lg">
                       <div>
-                        <p className="font-medium">{producto.nombre}</p>
-                        <p className="text-sm text-gray-500">Cantidad: {producto.cantidad}</p>
+                        <p className="font-medium">{producto?.nombre || 'Producto'}</p>
+                        <p className="text-sm text-gray-500">Cantidad: {producto?.cantidad || 0}</p>
                       </div>
-                      <p className="font-semibold">${producto.precio.toFixed(2)}</p>
+                      <p className="font-semibold">AR$ ${(Number(producto?.precio) || 0).toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
                   <span className="font-bold text-gray-800">Total:</span>
-                  <span className="text-2xl font-bold text-[#8c0315]">${ventaSeleccionada.total.toFixed(2)}</span>
+                  <span className="text-2xl font-bold text-[#8c0315]">AR$ ${(Number(ventaSeleccionada.total) || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -157,7 +150,7 @@ export const TablaVentas = ({ ventas, filtros }) => {
       {/* Resumen al final de la tabla */}
       <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
         <div>
-          Mostrando <span className="font-semibold">{ventasFiltradas.length}</span> de <span className="font-semibold">{ventas.length}</span> ventas
+          Mostrando <span className="font-semibold">{ventas.length}</span> de <span className="font-semibold">{totalOriginal}</span> ventas
         </div>
         <div className="flex items-center gap-4">
           <div className="flex gap-2">
