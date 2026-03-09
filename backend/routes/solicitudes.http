@@ -135,9 +135,9 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-    "nombre":"Camilaa",
-    "email": "camizamoraa_94@hotmail.com",
-    "password":"Teo4619533"
+    "nombre":"David",
+    "email": "david89@test.com",
+    "password":"12345678"
 }
 
 
@@ -146,8 +146,8 @@ POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-    "email": "camizamoraa_94@hotmail.com",
-    "password": "Teo4619533"
+    "email": "david89@test.com",
+    "password": "12345678"
 }
 
 ###
