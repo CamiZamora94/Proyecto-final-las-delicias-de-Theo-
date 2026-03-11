@@ -42,3 +42,41 @@ export const loginUser = async (req, res) => {
     res.status(500).json({ message: "Error interno al intentar loguear" });
   }
 };
+
+export const registerUser = async (req, res) => {
+  const { nombre, email, password } = req.body;
+  try {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const [result] = await db.query(
+      "INSERT INTO usuarios (nombre, email, password) VALUES (?, ?, ?)",
+      [nombre, email, hashedPassword],
+    );
+
+    res.status(201).json({
+      message: "Usuario creado exitosamente",
+      userId: result.insertId,
+      nombre,
+      email,
+    });
+  } catch (error) {
+    if (error.code === "ER_DUP_ENTRY") {
+      return res.status(400).json({ message: "El correo ya está registrado" });
+    }
+    res.status(500).json({ message: "Error interno en el servidor" });
+  }
+};
+
+export const getPerfil = (req, res) => {
+  res.json({
+    msg: "Perfil del usuario",
+    usuario: req.usuario,
+  });
+};
+
+export const logout = (req, res) => {
+  res.json({
+    message: "Logout ha sido exitoso (elimina el token en el frontend)",
+  });
+};
