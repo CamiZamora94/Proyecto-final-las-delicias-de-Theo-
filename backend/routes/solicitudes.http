@@ -1,5 +1,8 @@
+@token = tu_token_aqui
+
 ### Obtener todos los productos
 GET http://localhost:5000/api/productos
+Authorization: Bearer {{token}}
 
 ### Obtener producto por ID
 GET http://localhost:5000/api/productos/8
