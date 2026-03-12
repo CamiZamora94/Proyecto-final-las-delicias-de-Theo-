@@ -9,6 +9,7 @@ export const Ventas = () => {
   // --- ESTADOS ---
   const [datosVentas, setDatosVentas] = useState([]);
   const [cargando, setCargando] = useState(true);
+  const [error, setError] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   
   const [filtros, setFiltros] = useState({
@@ -22,15 +23,18 @@ export const Ventas = () => {
   const cargarVentas = async () => {
     try {
       setCargando(true);
+      setError(null);
       const data = await getVentas();
       if (Array.isArray(data)) {
         setDatosVentas(data);
       } else {
         console.error("Respuesta inesperada de la API:", data);
+        setError(data.message || data.error || "No se pudieron cargar las ventas. Verifique su sesión.");
         setDatosVentas([]);
       }
     } catch (error) {
       console.error("Error al obtener ventas:", error);
+      setError("Error de conexión con el servidor");
       setDatosVentas([]);
     } finally {
       setCargando(false);
@@ -101,6 +105,19 @@ export const Ventas = () => {
         promedioVenta={promedioVenta}
         totalTransacciones={ventasFiltradas.length}
       />
+
+      {error && (
+        <div style={{
+          backgroundColor: '#ffebee',
+          color: '#c62828',
+          padding: '12px',
+          marginTop: '20px',
+          borderRadius: '8px',
+          border: '1px solid #ef9a9a'
+        }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
 
       <h2 className="text-2xl font-bold text-gray-800 mt-8 mb-4">Historial de Ventas</h2>
 
