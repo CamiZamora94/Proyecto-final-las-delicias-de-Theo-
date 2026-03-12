@@ -1,13 +1,21 @@
+import { getHeaders } from "./api";
+
 const API_URL = "http://localhost:5000/api/ventas";
 
-export const getVentas = () => fetch(API_URL).then((res) => res.json());
+export const getVentas = () =>
+  fetch(API_URL, {
+    headers: getHeaders(),
+  }).then((res) => res.json());
 
 export const crearVenta = (ventaData) =>
   fetch(API_URL, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getHeaders(),
     body: JSON.stringify(ventaData),
   }).then((res) => res.json());
 
 export const eliminarVenta = (id) =>
-  fetch(`${API_URL}/${id}`, { method: "DELETE" });
+  fetch(`${API_URL}/${id}`, {
+    method: "DELETE",
+    headers: getHeaders(),
+  });
