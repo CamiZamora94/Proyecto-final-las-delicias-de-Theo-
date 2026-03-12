@@ -5,14 +5,23 @@ import { getProductos, eliminarProducto } from '../services/productos.service.js
 export const Inventario = () => { 
   const [productos, setProductos] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const cargarInventario = async () => {
     try {
+      setError(null);
       const data = await getProductos();
-      setProductos(data);
+      if (Array.isArray(data)) {
+        setProductos(data);
+      } else {
+        console.error("Respuesta inesperada del servidor:", data);
+        setError(data.error || data.message || "No se pudieron cargar los productos");
+        setProductos([]);
+      }
       setLoading(false);
     } catch (error) {
       console.error("Error al cargar productos:", error);
+      setError("Error de conexión con el servidor");
       setLoading(false);
     }
   };
@@ -32,11 +41,24 @@ export const Inventario = () => {
     }
   };
 
-  if (loading) return <p>Cargando inventario de pastelería...</p>;
+  if (loading) return <div style={{ padding: '20px' }}>Cargando inventario de pastelería...</div>;
 
   return (
-    <div className="inventario-container">
+    <div className="inventario-container" style={{ padding: '20px' }}>
       <h2>Gestión de Stock e Insumos</h2>
+      
+      {error && (
+        <div style={{ 
+          backgroundColor: '#ffebee', 
+          color: '#c62828', 
+          padding: '10px', 
+          marginBottom: '20px', 
+          borderRadius: '4px',
+          border: '1px solid #ef9a9a'
+        }}>
+          <strong>Error:</strong> {error}
+        </div>
+      )}
       <table border="1" style={{ width: '100%', textAlign: 'left', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ backgroundColor: '#f2f2f2' }}>
