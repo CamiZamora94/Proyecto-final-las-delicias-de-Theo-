@@ -11,6 +11,7 @@ import checkAuth from "../middleware/checkAuth.js";
 const { body, validationResult } = validatorPkg;
 export const router = express.Router();
 
+
 const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
