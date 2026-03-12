@@ -4,42 +4,40 @@ import jwt from "jsonwebtoken";
 
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
+  console.log("DEBUG: Intentando login para:", email);
   try {
-    // 1. Buscar al usuario en la base de datos de la pastelería
-    const [rows] = await db.query("SELECT * FROM usuarios WHERE email = ?", [
-      email,
-    ]);
+    const [rows] = await db.query("SELECT * FROM usuarios WHERE email = ?", [email]);
 
-    // Si no existe el correo, devolvemos error 404
     if (rows.length === 0) {
       return res.status(404).json({ message: "El usuario no existe" });
     }
 
     const usuario = rows[0];
 
-    // 2. Comparar la contraseña ingresada con el hash guardado en MySQL
     const isMatch = await bcrypt.compare(password, usuario.password);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Contraseña incorrecta" });
     }
 
-    // 3. Generar el JWT usando la clave de tu archivo .env
+    if (!process.env.JWT_SECRET) {
+      console.error("CRITICAL: JWT_SECRET is not defined in environment");
+      return res.status(500).json({ message: "Error de configuración en el servidor" });
+    }
+
     const token = jwt.sign(
       { id: usuario.id, rol: usuario.rol },
       process.env.JWT_SECRET,
-      { expiresIn: "8h" }, // Expira en una jornada laboral
+      { expiresIn: "8h" },
     );
 
-    // 4. Respuesta exitosa para React
     res.json({
       message: "Inicio de sesión exitoso",
       token,
     });
   } catch (error) {
     console.error("Error en login:", error);
-    res.status(500).json({ message: "Error interno al intentar loguear" });
+    res.status(500).json({ message: "Error interno al intentar loguear", error: error.message });
   }
 };
 
