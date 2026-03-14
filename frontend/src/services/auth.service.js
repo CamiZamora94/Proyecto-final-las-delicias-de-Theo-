@@ -11,9 +11,18 @@ export const register = async (userData) => {
 
 
 export const getPerfil = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No hay token");
+
   const response = await fetch(`${API_URL}/perfil/usuario`, {
-    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    headers: { Authorization: `Bearer ${token}` },
   });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Error al obtener perfil");
+  }
+
   return await response.json();
 };
 
@@ -36,6 +45,10 @@ export const login = async (credentials) => {
     return data;
   } catch (error) {
     console.error("Error en auth service:", error.message);
-    throw error; // Relanzamos para que login.jsx pueda mostrar el error al usuario
+    throw error;
   }
+};
+
+export const logout = () => {
+  localStorage.removeItem("token");
 };
